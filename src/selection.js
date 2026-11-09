@@ -211,8 +211,12 @@
   };
 
   const keys = natemail.keys;
-  keys.register({ key: "j", help: "Next thread", when: listActive, run: () => moveTo(cursorIndex + 1) });
-  keys.register({ key: "k", help: "Previous thread", when: listActive, run: () => moveTo(cursorIndex - 1) });
+  const next = () => moveTo(cursorIndex + 1);
+  const prev = () => moveTo(cursorIndex - 1);
+  keys.register({ key: "j", label: "j / ↓", help: "Next thread", when: listActive, run: next });
+  keys.register({ key: "k", label: "k / ↑", help: "Previous thread", when: listActive, run: prev });
+  keys.register({ key: "ArrowDown", when: listActive, run: next });
+  keys.register({ key: "ArrowUp", when: listActive, run: prev });
   keys.register({ key: "s", help: "Pick / unpick thread (act on several at once)", when: listActive, run: togglePick });
   keys.register({
     key: "Escape",

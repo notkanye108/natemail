@@ -192,6 +192,68 @@
       await dom.waitFor(() => !dom.visible(box.dialog), "saving the date & time (Gmail may not have accepted it)");
     },
 
+    // ---- Reading pane --------------------------------------------------------
+    // With Gmail's reading pane on, the list toolbar has a "Toggle split pane
+    // mode" button. Clicking it either toggles directly or opens a small menu
+    // (No split / Vertical split / Horizontal split).
+
+    splitPaneButton() {
+      const candidates = document.querySelectorAll(
+        '[role="button"][aria-label*="split pane" i], [role="button"][data-tooltip*="split pane" i]'
+      );
+      return [...candidates].find(natemail.dom.visible) || null;
+    },
+
+    splitPaneMenuItems() {
+      const items = [
+        ...document.querySelectorAll('[role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]'),
+      ].filter((i) => natemail.dom.visible(i) && /split/i.test(i.textContent));
+      return items.length >= 2 ? items : null;
+    },
+
+    // Switches between the list beside the thread and full-screen reading.
+    // `remembered` is "split" or "none": what we think it is now, used only if
+    // Gmail's menu doesn't say which option is current.
+    async toggleReadingPane(remembered) {
+      const dom = natemail.dom;
+      const button = dom.splitPaneButton();
+      if (!button) {
+        throw new Error(
+          "Couldn't find Gmail's split-pane button. Check Gmail settings → Inbox → Reading pane is on."
+        );
+      }
+      const hadSplit = Boolean(dom.openThread()) && dom.listRows().length > 0;
+      dom.realClick(button);
+
+      // Some Gmail versions open a menu; others toggle right away.
+      let items = null;
+      try {
+        items = await dom.waitFor(dom.splitPaneMenuItems, "", 400);
+      } catch (e) {
+        return; // toggled directly
+      }
+      const isOn = (i) => i.getAttribute("aria-checked") === "true" || i.getAttribute("aria-selected") === "true";
+      const current = items.find(isOn);
+      const nowSplit = current ? !/^\s*no split/i.test(current.textContent) : remembered === "split" || hadSplit;
+      const want = nowSplit
+        ? items.find((i) => /no split/i.test(i.textContent))
+        : items.find((i) => /vertical/i.test(i.textContent));
+      if (!want) throw new Error("Couldn't switch the reading pane (step: finding the menu option).");
+      dom.realClick(want);
+      return nowSplit ? "none" : "split";
+    },
+
+    // ---- Toolbar actions for the Cmd+K palette ------------------------------
+
+    toolbarButton(label) {
+      const re = new RegExp("^" + label, "i");
+      return (
+        [...document.querySelectorAll('[role="button"][aria-label], [role="button"][data-tooltip]')].find(
+          (b) => natemail.dom.visible(b) && (re.test(b.getAttribute("aria-label") || "") || re.test(b.getAttribute("data-tooltip") || ""))
+        ) || null
+      );
+    },
+
     // Your own address. Gmail puts it in the tab title: "Inbox (3) - you@x.com - Gmail".
     myEmail() {
       const m = /[\w.+-]+@[\w-]+(\.[\w-]+)+/.exec(document.title);

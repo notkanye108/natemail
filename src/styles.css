@@ -215,3 +215,23 @@ tr.zA.natemail-picked.natemail-cursor {
 .natemail-note--error {
   color: #b3261e;
 }
+
+/* Cmd+K palette */
+
+.natemail-palette .natemail-options {
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+.natemail-command {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.natemail-option[aria-selected="true"] kbd {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}

@@ -15,8 +15,8 @@ Full plan: [docs/SPEC.md](docs/SPEC.md)
 | 3 | Always-in-select cursor and core keys | done |
 | 4 | Sort a sender into a split, new splits | done |
 | 5 | Remind me | done |
-| 6 | Reading pane toggle, Cmd+K palette | next |
-| 7 | Calendar invite (stretch) | |
+| 6 | Reading pane toggle, Cmd+K palette | done |
+| 7 | Calendar invite (stretch) | next |
 
 ## Install (first time)
 
@@ -65,12 +65,14 @@ thread under the blue cursor is always selected.
 
 | Key | Does |
 |---|---|
-| `j` / `k` | Next / previous thread (clicking a thread also moves the cursor) |
+| `j` / `k` or `↓` / `↑` | Next / previous thread (clicking a thread also moves the cursor) |
 | `e` | Archive: the cursor thread, or every picked thread if you picked some |
 | `s` | Pick / unpick the cursor thread, to act on several at once |
 | `Esc` | Unpick all |
 | `Enter` / `o` | Open the thread (beside the list, with the reading pane on) |
 | `h` | Remind me: snooze until a time (`tomorrow 9am`, `fri`, `3d`, `nov 20`) |
+| `Shift+P` | Switch reading pane: thread beside the list ↔ full screen |
+| `Cmd+K` (`Ctrl+K` on Windows) | Command palette: type any action or split name |
 | `Shift+S` | Sort this sender into a split |
 | `Shift+N` | Make a new split |
 | `r` / `a` / `f` | Reply / reply all / forward, in an open thread (Gmail's own keys) |

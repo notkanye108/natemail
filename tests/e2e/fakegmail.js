@@ -11,7 +11,7 @@ module.exports = function fakeGmail(n = 6) {
     <td class="xT"><span data-thread-id="#thread-f:${1000 + i}">Subject ${i}</span></td></tr>`).join('');
   return `<html><head><title>Inbox (3) - nate.c.chandler@gmail.com - Gmail</title></head>
   <body style="margin:0;font-family:sans-serif">
-  <div role="main"><div>[toolbar] <span role="button" aria-label="Snooze" id="snooze">⏰</span></div><table id="list" style="width:100%">${rows}</table><div id="pane"></div></div>
+  <div role="main"><div>[toolbar] <span role="button" aria-label="Snooze" id="snooze">⏰</span> <span role="button" aria-label="Archive" id="archive">🗄</span> <span role="button" aria-label="Toggle split pane mode" id="splitbtn">◫</span></div><table id="list" style="width:100%">${rows}</table><div id="pane"></div></div>
   <script>
     window.gmailKeys = [];
     window.snoozed = [];
@@ -22,7 +22,18 @@ module.exports = function fakeGmail(n = 6) {
       });
       document.querySelectorAll('.fake-pop').forEach((x) => x.remove());
     };
+    // Fake reading-pane switch: a menu of No split / Vertical / Horizontal.
+    window.pane = 'vertical';
     document.addEventListener('click', (e) => {
+      if (e.target.id === 'archive') snoozeChecked('archived');
+      if (e.target.id === 'splitbtn') {
+        const m = document.createElement('div'); m.className = 'fake-pop'; m.setAttribute('role', 'menu');
+        m.innerHTML = [['none', 'No split'], ['vertical', 'Vertical split'], ['horizontal', 'Horizontal split']]
+          .map(([v, t]) => '<div role="menuitemradio" data-v="' + v + '" aria-checked="' + (pane === v) + '">' + t + '</div>').join('');
+        document.body.append(m);
+      }
+      const radio = e.target.closest('[role="menuitemradio"]');
+      if (radio) { pane = radio.dataset.v; document.querySelectorAll('.fake-pop').forEach((x) => x.remove()); }
       if (e.target.id === 'snooze') {
         const m = document.createElement('div'); m.className = 'fake-pop'; m.setAttribute('role', 'menu');
         m.innerHTML = ['Later today 6:00 PM', 'Tomorrow Tue, 8:00 AM', 'This weekend Sat, 8:00 AM', 'Next week Mon, 8:00 AM', 'Pick date & time']

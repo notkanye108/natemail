@@ -18,7 +18,7 @@
   ];
 
   natemail.keys = {
-    // binding = { key: "j", meta: false, label: "j", help: "Next thread",
+    // binding = { key: "j", cmd: false, label: "j", help: "Next thread",
     //             when: () => boolean, run: (event) => void,
     //             passThrough: false }
     // `key` is the character Chrome reports, so Shift+S is "S" and ? is "?".
@@ -27,14 +27,25 @@
       bindings.push(binding);
     },
 
+    // Every binding with a help text, for the ? screen and the Cmd+K palette.
+    list() {
+      return bindings.slice();
+    },
+
     // Modals (pickers, palette) set this so global keys pause while they're open.
     modalOpen: false,
   };
 
   function onKeyDown(e) {
     if (natemail.keys.modalOpen || dom.isTyping(e.target)) return;
-    if (e.altKey || e.ctrlKey) return;
-    const b = bindings.find((x) => x.key === e.key && Boolean(x.meta) === e.metaKey && (!x.when || x.when()));
+    if (e.altKey) return;
+    // `cmd: true` bindings answer to Cmd on a Mac and Ctrl elsewhere.
+    const cmd = e.metaKey || e.ctrlKey;
+    // Shift+S arrives as "S", so plain keys compare exactly. With Cmd/Ctrl,
+    // compare without case (Cmd+K arrives as "k" or "K").
+    const matches = (x) =>
+      cmd ? Boolean(x.cmd) && x.key.toLowerCase() === e.key.toLowerCase() : !x.cmd && x.key === e.key;
+    const b = bindings.find((x) => matches(x) && (!x.when || x.when()));
     if (!b) return;
     if (!b.passThrough) {
       e.preventDefault();

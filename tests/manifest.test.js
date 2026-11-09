@@ -18,7 +18,7 @@ test("only asks for the storage permission and Gmail access", () => {
 });
 
 test("every file referenced in the manifest exists", () => {
-  const files = [manifest.options_page];
+  const files = [manifest.options_page, manifest.background.service_worker];
   for (const cs of manifest.content_scripts) files.push(...cs.js, ...(cs.css || []));
   for (const f of files) {
     assert.ok(fs.existsSync(path.join(root, f)), `missing file: ${f}`);
