@@ -164,6 +164,85 @@
     return splits;
   }
 
+  // ---- Editing splits (used by Shift+S and Shift+N) -------------------------
+
+  // Two rules "cover the same people" if they'd fight over the same mail:
+  // same domain, or same address (as sender or anywhere on the thread).
+  function sameTarget(a, b) {
+    const va = clean(a.value).toLowerCase().replace(/^@/, "");
+    const vb = clean(b.value).toLowerCase().replace(/^@/, "");
+    if (va !== vb) return false;
+    const kind = (t) => (t === "domain" ? "domain" : t === "query" ? "query" : "address");
+    return kind(a.type) === kind(b.type);
+  }
+
+  // Names of the splits that already have a rule for these people.
+  function ownersOf(splits, rule) {
+    return splits.filter((s) => s.rules.some((r) => sameTarget(r, rule))).map((s) => s.name);
+  }
+
+  // Where a brand-new split should claim mail: ahead of any split that uses
+  // Gmail's broad "important" flag, so a specific sender wins over it.
+  function newSplitPriority(splits) {
+    const broad = byPriority(splits).find((s) =>
+      s.rules.some((r) => r.type === "query" && /is:important/i.test(r.value))
+    );
+    if (broad) return broad.priority - 0.5;
+    return Math.max(0, ...splits.map((s) => s.priority)) + 1;
+  }
+
+  // Returns a new list with an empty split added (displayed last, before Other).
+  function addSplit(splits, name, query) {
+    const n = clean(name);
+    if (!n) throw new Error("A split needs a name");
+    if (n.toLowerCase() === "other") throw new Error("Other is built in. Pick another name");
+    if (splits.some((s) => s.name.toLowerCase() === n.toLowerCase())) {
+      throw new Error(`There's already a split called ${n}`);
+    }
+    let id = slug(n) || "split";
+    while (id === OTHER_ID || splits.some((s) => s.id === id)) id += "-2";
+    const rules = clean(query) ? [{ type: "query", value: clean(query) }] : [];
+    const next = clone(splits);
+    next.push({ id, name: n, priority: newSplitPriority(splits), rules });
+    return { splits: normalizeSplits(next), id };
+  }
+
+  // Adds `rule` to split `targetId`, removing it from any other split first so
+  // the same people never live in two splits. Returns what moved.
+  function addRule(splits, targetId, rule) {
+    const value = clean(rule.value).toLowerCase().replace(rule.type === "domain" ? /^@/ : /^$/, "");
+    if (!value) throw new Error("Nothing to add");
+    if (!RULE_TYPES[rule.type]) throw new Error("Unknown rule type: " + rule.type);
+    const added = { type: rule.type, value };
+
+    const next = clone(splits);
+    const target = next.find((s) => s.id === targetId);
+    if (!target) throw new Error("That split doesn't exist anymore");
+
+    const movedFrom = [];
+    for (const s of next) {
+      const before = s.rules.length;
+      s.rules = s.rules.filter((r) => !sameTarget(r, added));
+      if (s.rules.length !== before && s.id !== targetId) movedFrom.push(s.name);
+    }
+    target.rules.push(added);
+    return { splits: normalizeSplits(next), target: target.name, rule: added, movedFrom };
+  }
+
+  // How a rule reads in a sentence: "alerts@x.com", "anyone at @x.com", ...
+  function describeRule(rule) {
+    switch (rule.type) {
+      case "sender":
+        return rule.value;
+      case "domain":
+        return "anyone at @" + rule.value.replace(/^@/, "");
+      case "involves":
+        return "any thread with " + rule.value;
+      default:
+        return rule.value;
+    }
+  }
+
   function slug(name) {
     return clean(name)
       .toLowerCase()
@@ -188,6 +267,10 @@
     activeTabId,
     normalizeSplits,
     slug,
+    ownersOf,
+    addSplit,
+    addRule,
+    describeRule,
   };
 
   if (typeof module !== "undefined" && module.exports) {

@@ -112,3 +112,102 @@ tr.zA.natemail-kept {
   background: #f8f9fa;
   font: 12px/1.6 ui-monospace, Menlo, monospace;
 }
+
+/* Shift+S and Shift+N */
+
+.natemail-sort-who {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.natemail-muted {
+  color: #5f6368;
+}
+
+.natemail-hint {
+  margin-left: auto;
+  color: #5f6368;
+  font-size: 12px;
+}
+
+.natemail-sort-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.natemail-mode {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid #dadce0;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f1f1f;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.natemail-mode[aria-pressed="true"] {
+  border-color: #0b57d0;
+  background: rgba(11, 87, 208, 0.08);
+}
+
+.natemail-mode:disabled {
+  color: #9aa0a6;
+  cursor: default;
+}
+
+.natemail-input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 9px 12px;
+  border: 1px solid #dadce0;
+  border-radius: 10px;
+  font: inherit;
+  outline: none;
+}
+
+.natemail-input:focus {
+  border-color: #0b57d0;
+}
+
+.natemail-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.natemail-option {
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.natemail-option[aria-selected="true"] {
+  background: #0b57d0;
+  color: #fff;
+}
+
+.natemail-option--create {
+  font-style: italic;
+}
+
+.natemail-note {
+  min-height: 1.2em;
+  margin-top: 8px;
+  color: #5f6368;
+  font-size: 12px;
+}
+
+.natemail-note--error {
+  color: #b3261e;
+}

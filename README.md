@@ -13,8 +13,8 @@ Full plan: [docs/SPEC.md](docs/SPEC.md)
 | 1 | Skeleton: loads in Gmail and shows "natemail loaded" | done |
 | 2 | Split inbox tabs, options page | done |
 | 3 | Always-in-select cursor and core keys | done |
-| 4 | Sort a sender into a split, new splits | next |
-| 5 | Remind me | |
+| 4 | Sort a sender into a split, new splits | done |
+| 5 | Remind me | next |
 | 6 | Reading pane toggle, Cmd+K palette | |
 | 7 | Calendar invite (stretch) | |
 
@@ -46,7 +46,13 @@ Don't delete or move the folder afterward. Chrome runs the extension from it.
 
 - Tabs sit above the Gmail message list. Click one, or press `Tab` /
   `Shift+Tab` to move between them. Grey tabs have no rules yet.
-- Edit splits: right-click the natemail icon in Chrome's toolbar (or find it
+- **Sort a sender:** on any thread, press `Shift+S`. Pick who
+  (`1` just this address, `2` anyone at their domain, `3` any thread this
+  address is on; `Tab` switches to another person on the thread), type a split
+  name, and press `Enter`. Type a new name to create a split on the spot. A
+  sender lives in one split at a time, so this moves them if needed.
+- **New split:** press `Shift+N`.
+- Edit splits in detail: right-click the natemail icon in Chrome's toolbar (or find it
   under the puzzle-piece icon), then **Options**.
 - Each email lands in exactly one tab. When an email matches two splits, the
   one with the lower **Claim order** number gets it. **Other** catches the rest.
@@ -64,6 +70,8 @@ thread under the blue cursor is always selected.
 | `s` | Keep this thread selected while you move, to act on several at once |
 | `Esc` | Clear the multi-selection |
 | `Enter` / `o` | Open the thread (beside the list, with the reading pane on) |
+| `Shift+S` | Sort this sender into a split |
+| `Shift+N` | Make a new split |
 | `r` / `a` / `f` | Reply / reply all / forward, in an open thread (Gmail's own keys) |
 
 Gmail's keyboard shortcuts must be on: Settings → See all settings → General →
@@ -82,3 +90,6 @@ Needs [Node.js](https://nodejs.org) 18 or newer. From the `natemail` folder:
 ```
 node --test
 ```
+
+Optional browser checks against a fake Gmail page (needs Playwright):
+`tests/e2e/run.sh`

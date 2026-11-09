@@ -25,7 +25,7 @@
 
   function goToTab(tab) {
     if (!tab.query) {
-      natemail.toast(`${tab.name} has no senders yet. Add some on the natemail options page.`, { ms: 4000 });
+      natemail.toast(`${tab.name} has no senders yet. Press Shift+S on one of their emails.`, { ms: 4000 });
       return;
     }
     location.hash = S.searchHash(tab.query);

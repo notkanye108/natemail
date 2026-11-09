@@ -92,3 +92,60 @@ test("default splits: Calendar claims before Important", () => {
   const d = S.normalizeSplits(S.DEFAULT_SPLITS);
   assert.ok(S.tabQuery(d, "important").includes('-((filename:invite.ics) OR from:"calendar-notification@google.com")'));
 });
+
+// ---- Shift+S / Shift+N ------------------------------------------------------
+
+const base = () => S.normalizeSplits(S.DEFAULT_SPLITS);
+
+test("addRule puts a sender into a split", () => {
+  const r = S.addRule(base(), "datadog", { type: "domain", value: "@DatadogHQ.com " });
+  const dd = r.splits.find((s) => s.id === "datadog");
+  assert.deepStrictEqual(dd.rules, [{ type: "domain", value: "datadoghq.com" }]);
+  assert.deepStrictEqual(r.movedFrom, []);
+  assert.strictEqual(r.target, "Datadog");
+  assert.strictEqual(S.tabQuery(r.splits, "datadog").startsWith("in:inbox from:(@datadoghq.com)"), true);
+});
+
+test("addRule moves a sender out of the split it was in", () => {
+  let sp = S.addRule(base(), "quo", { type: "sender", value: "a@b.com" }).splits;
+  const r = S.addRule(sp, "datadog", { type: "involves", value: "A@b.com" });
+  assert.deepStrictEqual(r.movedFrom, ["Quo"]);
+  assert.deepStrictEqual(r.splits.find((s) => s.id === "quo").rules, []);
+  assert.deepStrictEqual(r.splits.find((s) => s.id === "datadog").rules, [{ type: "involves", value: "a@b.com" }]);
+});
+
+test("addRule on the same split twice doesn't duplicate", () => {
+  let sp = S.addRule(base(), "quo", { type: "sender", value: "a@b.com" }).splits;
+  const r = S.addRule(sp, "quo", { type: "sender", value: "a@b.com" });
+  assert.strictEqual(r.splits.find((s) => s.id === "quo").rules.length, 1);
+  assert.deepStrictEqual(r.movedFrom, []);
+});
+
+test("a domain rule and an address rule don't clash", () => {
+  let sp = S.addRule(base(), "quo", { type: "domain", value: "b.com" }).splits;
+  const r = S.addRule(sp, "datadog", { type: "sender", value: "x@b.com" });
+  assert.deepStrictEqual(r.movedFrom, []);
+});
+
+test("ownersOf names the split a sender is in", () => {
+  const sp = S.addRule(base(), "quo", { type: "sender", value: "a@b.com" }).splits;
+  assert.deepStrictEqual(S.ownersOf(sp, { type: "sender", value: "A@B.com" }), ["Quo"]);
+  assert.deepStrictEqual(S.ownersOf(sp, { type: "domain", value: "b.com" }), []);
+});
+
+test("addSplit adds a split that claims mail before Important", () => {
+  const r = S.addSplit(base(), "Investors");
+  const inv = r.splits.find((s) => s.id === r.id);
+  const imp = r.splits.find((s) => s.id === "important");
+  assert.strictEqual(r.id, "investors");
+  assert.strictEqual(r.splits[r.splits.length - 1].name, "Investors", "shown last");
+  assert.ok(inv.priority < imp.priority, "claims before Important");
+  assert.throws(() => S.addSplit(r.splits, "investors"), /already a split/);
+  assert.throws(() => S.addSplit(r.splits, "  "), /needs a name/);
+});
+
+test("addSplit can start with a raw search, and 'Other' is reserved", () => {
+  assert.throws(() => S.addSplit(base(), "other"), /built in/);
+  const r = S.addSplit(base(), "Newsletters", "label:x");
+  assert.deepStrictEqual(r.splits.find((s) => s.id === r.id).rules, [{ type: "query", value: "label:x" }]);
+});
