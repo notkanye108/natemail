@@ -1,0 +1,19 @@
+/* All natemail classes start with "natemail-" so they never clash with Gmail. */
+
+.natemail-toast {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 2147483647;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #202124;
+  color: #fff;
+  font: 500 13px/1.4 system-ui, -apple-system, sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+.natemail-toast--error {
+  background: #b3261e;
+}
