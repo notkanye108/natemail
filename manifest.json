@@ -1,14 +1,23 @@
 {
   "manifest_version": 3,
   "name": "natemail",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Split inbox and keyboard-first triage for Gmail. Runs entirely in your browser.",
   "permissions": ["storage"],
   "host_permissions": ["https://mail.google.com/*"],
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
-      "js": ["src/splits.js", "src/store.js", "src/gmail-dom.js", "src/split-tabs.js", "src/content.js"],
+      "js": [
+        "src/splits.js",
+        "src/store.js",
+        "src/gmail-dom.js",
+        "src/ui.js",
+        "src/keys.js",
+        "src/split-tabs.js",
+        "src/selection.js",
+        "src/content.js"
+      ],
       "css": ["src/styles.css"],
       "run_at": "document_idle"
     }

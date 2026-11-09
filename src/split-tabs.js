@@ -98,7 +98,7 @@
 
   function onKeyDown(e) {
     if (e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
-    if (dom.isTyping(e.target) || !shouldShow()) return;
+    if (natemail.keys.modalOpen || dom.isTyping(e.target) || !shouldShow()) return;
 
     const list = currentTabs().filter((t) => t.query);
     if (list.length === 0) return;
@@ -113,10 +113,21 @@
   }
 
   natemail.splitTabs = {
+    tabs: currentTabs,
+    goToTab,
     async start() {
       splits = await natemail.store.loadSplits();
       natemail.store.onSplitsChanged((next) => {
+        // If you're on a split whose rules just changed, its search changed
+        // too. Follow it, so you stay on the same tab.
+        const wasOn = S.activeTabId(splits, location.hash) || null;
         splits = next;
+        if (wasOn) {
+          const tab = currentTabs().find((t) => t.id === wasOn);
+          if (tab && tab.query && S.activeTabId(splits, location.hash) !== wasOn) {
+            location.hash = S.searchHash(tab.query);
+          }
+        }
         sync();
       });
       window.addEventListener("hashchange", sync);

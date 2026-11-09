@@ -12,8 +12,8 @@ Full plan: [docs/SPEC.md](docs/SPEC.md)
 |---|---|---|
 | 1 | Skeleton: loads in Gmail and shows "natemail loaded" | done |
 | 2 | Split inbox tabs, options page | done |
-| 3 | Always-in-select cursor and core keys | next |
-| 4 | Sort a sender into a split, new splits | |
+| 3 | Always-in-select cursor and core keys | done |
+| 4 | Sort a sender into a split, new splits | next |
 | 5 | Remind me | |
 | 6 | Reading pane toggle, Cmd+K palette | |
 | 7 | Calendar invite (stretch) | |
@@ -51,6 +51,23 @@ Don't delete or move the folder afterward. Chrome runs the extension from it.
 - Each email lands in exactly one tab. When an email matches two splits, the
   one with the lower **Claim order** number gets it. **Other** catches the rest.
 - A tab is just a Gmail search, so you'll see that search in Gmail's search bar.
+
+## Keyboard
+
+Press `?` in Gmail for the full list. The main idea: in the message list, the
+thread under the blue cursor is always selected.
+
+| Key | Does |
+|---|---|
+| `j` / `k` | Next / previous thread (and selects it) |
+| `e` | Archive everything selected |
+| `s` | Keep this thread selected while you move, to act on several at once |
+| `Esc` | Clear the multi-selection |
+| `Enter` / `o` | Open the thread (beside the list, with the reading pane on) |
+| `r` / `a` / `f` | Reply / reply all / forward, in an open thread (Gmail's own keys) |
+
+Gmail's keyboard shortcuts must be on: Settings → See all settings → General →
+Keyboard shortcuts on.
 
 ## If something breaks
 
