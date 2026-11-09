@@ -11,8 +11,8 @@ Full plan: [docs/SPEC.md](docs/SPEC.md)
 | Phase | What | State |
 |---|---|---|
 | 1 | Skeleton: loads in Gmail and shows "natemail loaded" | done |
-| 2 | Split inbox tabs | next |
-| 3 | Always-in-select cursor and core keys | |
+| 2 | Split inbox tabs, options page | done |
+| 3 | Always-in-select cursor and core keys | next |
 | 4 | Sort a sender into a split, new splits | |
 | 5 | Remind me | |
 | 6 | Reading pane toggle, Cmd+K palette | |
@@ -41,6 +41,16 @@ Don't delete or move the folder afterward. Chrome runs the extension from it.
 2. Go to `chrome://extensions` and click the circular reload arrow on the
    natemail card.
 3. Refresh Gmail.
+
+## Splits
+
+- Tabs sit above the Gmail message list. Click one, or press `Tab` /
+  `Shift+Tab` to move between them. Grey tabs have no rules yet.
+- Edit splits: right-click the natemail icon in Chrome's toolbar (or find it
+  under the puzzle-piece icon), then **Options**.
+- Each email lands in exactly one tab. When an email matches two splits, the
+  one with the lower **Claim order** number gets it. **Other** catches the rest.
+- A tab is just a Gmail search, so you'll see that search in Gmail's search bar.
 
 ## If something breaks
 

@@ -3,12 +3,28 @@
   <head>
     <meta charset="utf-8" />
     <title>natemail options</title>
-    <style>
-      body { font: 14px/1.5 system-ui, -apple-system, sans-serif; margin: 40px; max-width: 640px; }
-    </style>
+    <link rel="stylesheet" href="options.css" />
   </head>
   <body>
-    <h1>natemail</h1>
-    <p>Split settings arrive in Phase 2.</p>
+    <h1>natemail splits</h1>
+    <p class="hint">
+      Tabs appear in Gmail in the order below. <strong>Claim order</strong> decides
+      where an email goes when it matches more than one split: lower numbers claim
+      first. <strong>Other</strong> is always last and catches everything left over.
+    </p>
+
+    <div id="splits"></div>
+
+    <div class="actions">
+      <button id="add-split" type="button">+ Add split</button>
+      <span class="spacer"></span>
+      <button id="reset" type="button" class="secondary">Reset to defaults</button>
+      <button id="save" type="button" class="primary">Save</button>
+    </div>
+    <p id="status" role="status"></p>
+
+    <script src="../src/splits.js"></script>
+    <script src="../src/store.js"></script>
+    <script src="options.js"></script>
   </body>
 </html>

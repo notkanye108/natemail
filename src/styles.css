@@ -17,3 +17,38 @@
 .natemail-toast--error {
   background: #b3261e;
 }
+
+/* Split inbox tab bar */
+
+.natemail-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px 6px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  font: 500 13px/1 system-ui, -apple-system, sans-serif;
+}
+
+.natemail-tab {
+  flex: none;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #444746;
+  font: inherit;
+  cursor: pointer;
+}
+
+.natemail-tab:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.natemail-tab[aria-selected="true"] {
+  background: #0b57d0;
+  color: #fff;
+}
+
+.natemail-tab--empty {
+  color: #9aa0a6;
+}

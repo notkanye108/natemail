@@ -16,12 +16,13 @@
 
   natemail.dom
     .waitForGmail()
+    .then(() => natemail.splitTabs.start())
     .then(() => {
       console.log("[natemail] loaded");
       natemail.toast("natemail loaded");
     })
     .catch((err) => {
       console.error("[natemail]", err);
-      natemail.toast("natemail couldn't find Gmail on this page", { error: true, ms: 6000 });
+      natemail.toast("natemail didn't start: " + err.message, { error: true, ms: 6000 });
     });
 })();
