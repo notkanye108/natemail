@@ -190,6 +190,7 @@
       return rows().filter(wanted);
     },
     cursorRow() {
+      if (cursorRow && !cursorRow.isConnected) resync(); // Gmail just removed it
       return cursorRow && cursorRow.isConnected ? cursorRow : null;
     },
     // Re-checks everything right now. Call before an action reads selection.

@@ -11,9 +11,39 @@ module.exports = function fakeGmail(n = 6) {
     <td class="xT"><span data-thread-id="#thread-f:${1000 + i}">Subject ${i}</span></td></tr>`).join('');
   return `<html><head><title>Inbox (3) - nate.c.chandler@gmail.com - Gmail</title></head>
   <body style="margin:0;font-family:sans-serif">
-  <div role="main"><div>[toolbar]</div><table id="list" style="width:100%">${rows}</table><div id="pane"></div></div>
+  <div role="main"><div>[toolbar] <span role="button" aria-label="Snooze" id="snooze">⏰</span></div><table id="list" style="width:100%">${rows}</table><div id="pane"></div></div>
   <script>
     window.gmailKeys = [];
+    window.snoozed = [];
+    // Fake Snooze: menu, then an optional "Pick date & time" dialog.
+    const snoozeChecked = (label) => {
+      document.querySelectorAll('tr.zA').forEach((r) => {
+        if (r.querySelector('.cb').getAttribute('aria-checked') === 'true') { snoozed.push(r.querySelector('.xT').textContent + ' @ ' + label); r.remove(); }
+      });
+      document.querySelectorAll('.fake-pop').forEach((x) => x.remove());
+    };
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'snooze') {
+        const m = document.createElement('div'); m.className = 'fake-pop'; m.setAttribute('role', 'menu');
+        m.innerHTML = ['Later today 6:00 PM', 'Tomorrow Tue, 8:00 AM', 'This weekend Sat, 8:00 AM', 'Next week Mon, 8:00 AM', 'Pick date & time']
+          .map((t) => '<div role="menuitem">' + t + '</div>').join('');
+        document.body.append(m);
+      }
+      const item = e.target.closest('[role="menuitem"]');
+      if (item && /pick date/i.test(item.textContent)) {
+        document.querySelectorAll('.fake-pop').forEach((x) => x.remove());
+        const d = document.createElement('div'); d.className = 'fake-pop'; d.setAttribute('role', 'dialog');
+        d.innerHTML = '<input aria-label="Date"><input aria-label="Time"><div role="button" id="save">Save</div>';
+        document.body.append(d);
+      } else if (item) {
+        snoozeChecked(item.textContent);
+      }
+      if (e.target.id === 'save') {
+        const [date, time] = [...document.querySelectorAll('[role="dialog"] input')].map((i) => i.value);
+        // Like Gmail: only accept the formats it shows.
+        if (/^[A-Z][a-z]{2} \\d{1,2}, \\d{4}$/.test(date) && /^\\d{1,2}:\\d{2} [AP]M$/.test(time)) snoozeChecked(date + ' ' + time);
+      }
+    }, true);
     document.addEventListener('click', (e) => {
       const cb = e.target.closest('.cb');
       if (cb) { const on = cb.getAttribute('aria-checked') !== 'true'; cb.setAttribute('aria-checked', String(on)); cb.textContent = on ? '☑' : '☐'; return; }

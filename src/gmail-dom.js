@@ -100,6 +100,98 @@
       return null;
     },
 
+    // ---- Snooze --------------------------------------------------------------
+    // natemail drives Gmail's own Snooze menu, so reminders sync to your phone
+    // and come back even when your laptop is closed. Steps:
+    //   1. click Gmail's Snooze button (toolbar, acts on the selected threads)
+    //   2. in the menu, click a preset ("Tomorrow") or "Pick date & time"
+    //   3. for a custom time: fill in the date and time boxes, click Save
+    // Each step throws an error naming itself, so a break is easy to locate.
+
+    visible(el) {
+      return Boolean(el && el.getClientRects().length > 0);
+    },
+
+    // Resolves with the first visible match of `find()`, or rejects.
+    async waitFor(find, step, timeoutMs = 2500) {
+      const start = Date.now();
+      while (Date.now() - start < timeoutMs) {
+        const found = find();
+        if (found) return found;
+        await new Promise((r) => setTimeout(r, 50));
+      }
+      throw new Error(`Couldn't snooze (step: ${step}).`);
+    },
+
+    snoozeButton() {
+      const candidates = document.querySelectorAll(
+        '[role="button"][aria-label^="Snooze"], [role="button"][data-tooltip^="Snooze"]'
+      );
+      return [...candidates].find(natemail.dom.visible) || null;
+    },
+
+    // Visible menu items in Gmail's open Snooze menu.
+    snoozeMenuItems() {
+      const items = [...document.querySelectorAll('[role="menu"] [role="menuitem"], [role="menuitem"]')].filter(
+        natemail.dom.visible
+      );
+      return items.some((i) => /pick date/i.test(i.textContent)) ? items : null;
+    },
+
+    // Gmail's "Pick date & time" dialog, once open: its date box, time box, Save.
+    snoozeDialog() {
+      for (const d of document.querySelectorAll('[role="dialog"], [role="alertdialog"]')) {
+        if (!natemail.dom.visible(d)) continue;
+        const inputs = [...d.querySelectorAll("input")].filter(natemail.dom.visible);
+        const byLabel = (re) =>
+          inputs.find((i) => re.test((i.getAttribute("aria-label") || "") + " " + (i.getAttribute("placeholder") || "")));
+        const date = byLabel(/date/i) || inputs[0];
+        const time = byLabel(/time/i) || inputs[1];
+        const save = [...d.querySelectorAll('[role="button"], button')].find(
+          (b) => natemail.dom.visible(b) && /^\s*save\s*$/i.test(b.textContent)
+        );
+        if (date && time && save) return { dialog: d, date, time, save };
+      }
+      return null;
+    },
+
+    // Types into one of Gmail's text boxes the way a person would.
+    fillInput(input, value) {
+      input.focus();
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+      setter.call(input, value);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+      input.blur();
+    },
+
+    // Snoozes whatever Gmail has selected (or the open thread).
+    // `when` is a Date, or a preset name Gmail shows ("Tomorrow").
+    async snooze(when) {
+      const dom = natemail.dom;
+      const button = await dom.waitFor(dom.snoozeButton, "finding Gmail's Snooze button", 1500);
+      dom.realClick(button);
+      const items = await dom.waitFor(dom.snoozeMenuItems, "opening Gmail's Snooze menu");
+
+      if (typeof when === "string") {
+        const item = items.find((i) => i.textContent.trim().toLowerCase().startsWith(when.toLowerCase()));
+        if (!item) throw new Error(`Couldn't snooze (step: finding "${when}" in Gmail's menu).`);
+        dom.realClick(item);
+        return;
+      }
+
+      dom.realClick(items.find((i) => /pick date/i.test(i.textContent)));
+      const box = await dom.waitFor(dom.snoozeDialog, "opening Gmail's date & time box");
+      // Gmail shows these as "Nov 20, 2026" and "9:00 AM".
+      // Chrome puts an invisible special space before "AM"; Gmail wants a normal one.
+      const plain = (t) => t.replace(/[\u202f\u00a0]/g, " ");
+      dom.fillInput(box.date, plain(when.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })));
+      dom.fillInput(box.time, plain(when.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })));
+      dom.realClick(box.save);
+      await dom.waitFor(() => !dom.visible(box.dialog), "saving the date & time (Gmail may not have accepted it)");
+    },
+
     // Your own address. Gmail puts it in the tab title: "Inbox (3) - you@x.com - Gmail".
     myEmail() {
       const m = /[\w.+-]+@[\w-]+(\.[\w-]+)+/.exec(document.title);

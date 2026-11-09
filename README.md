@@ -14,8 +14,8 @@ Full plan: [docs/SPEC.md](docs/SPEC.md)
 | 2 | Split inbox tabs, options page | done |
 | 3 | Always-in-select cursor and core keys | done |
 | 4 | Sort a sender into a split, new splits | done |
-| 5 | Remind me | next |
-| 6 | Reading pane toggle, Cmd+K palette | |
+| 5 | Remind me | done |
+| 6 | Reading pane toggle, Cmd+K palette | next |
 | 7 | Calendar invite (stretch) | |
 
 ## Install (first time)
@@ -70,12 +70,24 @@ thread under the blue cursor is always selected.
 | `s` | Pick / unpick the cursor thread, to act on several at once |
 | `Esc` | Unpick all |
 | `Enter` / `o` | Open the thread (beside the list, with the reading pane on) |
+| `h` | Remind me: snooze until a time (`tomorrow 9am`, `fri`, `3d`, `nov 20`) |
 | `Shift+S` | Sort this sender into a split |
 | `Shift+N` | Make a new split |
 | `r` / `a` / `f` | Reply / reply all / forward, in an open thread (Gmail's own keys) |
 
 Gmail's keyboard shortcuts must be on: Settings → See all settings → General →
 Keyboard shortcuts on.
+
+## Remind me
+
+Press `h`, then pick a preset with the arrow keys or type a time and press
+`Enter`. natemail uses Gmail's own Snooze, so the thread comes back at that time
+on every device, even with your laptop closed.
+
+Typing works for: `2h`, `30m`, `3d`, `1w`, `5pm`, `tonight`, `tomorrow`,
+`tmrw 9am`, `mon`, `friday 2pm`, `this weekend`, `next week`, `nov 20`,
+`nov 20 10am`, `11/20`. With no time given, it's 8:00 AM. A plain `3` means
+3 PM.
 
 ## If something breaks
 
