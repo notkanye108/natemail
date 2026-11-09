@@ -27,7 +27,11 @@ module.exports = function fakeGmail(n = 6) {
     document.addEventListener('keydown', (e) => {
       if (e.target.closest('input')) return;
       window.gmailKeys.push(e.key);
-      if (e.key === 'e') document.querySelectorAll('tr.zA').forEach((r) => { if (r.querySelector('.cb').getAttribute('aria-checked') === 'true') r.remove(); });
+      if (e.key === 'e') {
+        document.querySelectorAll('tr.zA').forEach((r) => { if (r.querySelector('.cb').getAttribute('aria-checked') === 'true') r.remove(); });
+        // Like real Gmail: a moment after an action, it clears every checkbox.
+        setTimeout(() => document.querySelectorAll('.cb').forEach((c) => { c.setAttribute('aria-checked', 'false'); c.textContent = '☐'; }), 150);
+      }
     });
   </script></body></html>`;
 };

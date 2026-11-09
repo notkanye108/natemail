@@ -65,10 +65,10 @@ thread under the blue cursor is always selected.
 
 | Key | Does |
 |---|---|
-| `j` / `k` | Next / previous thread (and selects it) |
-| `e` | Archive everything selected |
-| `s` | Keep this thread selected while you move, to act on several at once |
-| `Esc` | Clear the multi-selection |
+| `j` / `k` | Next / previous thread (clicking a thread also moves the cursor) |
+| `e` | Archive: the cursor thread, or every picked thread if you picked some |
+| `s` | Pick / unpick the cursor thread, to act on several at once |
+| `Esc` | Unpick all |
 | `Enter` / `o` | Open the thread (beside the list, with the reading pane on) |
 | `Shift+S` | Sort this sender into a split |
 | `Shift+N` | Make a new split |
